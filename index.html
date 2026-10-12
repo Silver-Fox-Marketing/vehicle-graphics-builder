@@ -1331,11 +1331,15 @@ body.present #present .ico-off { display: block; }
 
 <div class="print-out" id="printOut"></div>
 
-<script src="assets/layout.js"></script>
+<script src="assets/layout.js?v=9ae10e5d1f"></script>
 <script>
 (() => {
   const L = window.VGB_LAYOUT;
   const [W, H] = L.stage;
+  // Every asset URL carries the build's stamp, filled in by build/publish_pages.py when it publishes. A published
+  // update then reaches a visitor on a normal reload, not after the browser's ten-minute cache.
+  const ASSET_V = '9ae10e5d1f';
+  const av = (u) => `${u}${u.includes('?') ? '&' : '?'}v=${ASSET_V}`;
   const MAX_ZOOM = 3.4;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const RING = ['driver34', 'front', 'pass34', 'side', 'rear34', 'rear'];
@@ -1440,7 +1444,7 @@ body.present #present .ico-off { display: block; }
     li.alt = '';
     li.draggable = false;
     li.decoding = 'async';
-    li.dataset.src = lay.src;
+    li.dataset.src = av(lay.src);
     const [x0, y0, x1, y1] = lay.box;
     Object.assign(li.style, {
       left: (x0 / W) * 100 + '%', top: (y0 / H) * 100 + '%',
@@ -1462,7 +1466,7 @@ body.present #present .ico-off { display: block; }
       base.className = 'base';
       base.alt = '';
       base.draggable = false;
-      base.src = `assets/views/${V.id}/${v}.jpg`;
+      base.src = av(`assets/views/${V.id}/${v}.jpg`);
       f.append(base);
       for (const pk of Object.keys(V.parts)) {
         const li = makeLayer(pk, v);
@@ -1746,7 +1750,7 @@ body.present #present .ico-off { display: block; }
         b.className = 'card';
         b.dataset.key = o.key;
         b.dataset.tip = `${sizeText(o)}. Example: ${own(o, 'dealer')}.`;
-        b.innerHTML = `<span class="card-art${onGlass(o)}"><img src="${own(o, 'thumb')}" alt="" loading="lazy"><span class="card-check" aria-hidden="true">${icon.check}</span><span class="card-swap">${icon.swap}</span></span><span class="card-name">${o.shape.replace(/ (\d+)$/, '\u00a0$1')}</span><span class="card-msg">${own(o, 'message')}</span><span class="card-detail">${sizeText(o)}, ${own(o, 'dealer')}</span><span class="card-replaces" aria-hidden="true"></span><span class="sr card-swap-sr"></span>`;
+        b.innerHTML = `<span class="card-art${onGlass(o)}"><img src="${av(own(o, 'thumb'))}" alt="" loading="lazy"><span class="card-check" aria-hidden="true">${icon.check}</span><span class="card-swap">${icon.swap}</span></span><span class="card-name">${o.shape.replace(/ (\d+)$/, '\u00a0$1')}</span><span class="card-msg">${own(o, 'message')}</span><span class="card-detail">${sizeText(o)}, ${own(o, 'dealer')}</span><span class="card-replaces" aria-hidden="true"></span><span class="sr card-swap-sr"></span>`;
         b.addEventListener('click', () => toggle(o.key));
         b.addEventListener('mouseenter', () => highlightSurfaces(o.surfaces));
         b.addEventListener('mouseleave', () => highlightSurfaces([]));
@@ -1824,13 +1828,13 @@ body.present #present .ico-off { display: block; }
       for (const { t, kept, view } of items) {
         const [x0, y0, w, h2] = size ? shotBox(kept, view, 1.5) : shotBox(sets.filter((x) => x.view === view).flatMap((x) => x.kept), view);
         const layers = kept.flatMap((k) => byKey[k].parts).map((p) => (V.parts[p] || { layers: {} }).layers[view]).filter(Boolean)
-          .map(({ src, box: [a, b, c, d] }) => `<img src="${src}" alt="" loading="lazy" decoding="async" style="left:${pct(a, W)};top:${pct(b, H)};width:${pct(c - a, W)};height:${pct(d - b, H)}">`).join('');
+          .map(({ src, box: [a, b, c, d] }) => `<img src="${av(src)}" alt="" loading="lazy" decoding="async" style="left:${pct(a, W)};top:${pct(b, H)};width:${pct(c - a, W)};height:${pct(d - b, H)}">`).join('');
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'theme-card';
         b.dataset.theme = t.id;
         const when = t.months ? `<span class="theme-when">${monthText(t.months)}</span>` : '';
-        b.innerHTML = `<span class="theme-shot"><span class="theme-world" style="left:${pct(-x0, w)};top:${pct(-y0, h2)};width:${pct(W, w)};height:${pct(H, h2)}"><img class="base" src="assets/views/${V.id}/${view}.jpg" alt="" loading="lazy" decoding="async">${layers}</span>${when}<span class="card-check" aria-hidden="true">${icon.check}</span></span><span class="theme-meta"><span class="theme-name">${t.title}</span><span class="theme-count"></span></span><span class="theme-blurb">${t.blurb}</span>`;
+        b.innerHTML = `<span class="theme-shot"><span class="theme-world" style="left:${pct(-x0, w)};top:${pct(-y0, h2)};width:${pct(W, w)};height:${pct(H, h2)}"><img class="base" src="${av(`assets/views/${V.id}/${view}.jpg`)}" alt="" loading="lazy" decoding="async">${layers}</span>${when}<span class="card-check" aria-hidden="true">${icon.check}</span></span><span class="theme-meta"><span class="theme-name">${t.title}</span><span class="theme-count"></span></span><span class="theme-blurb">${t.blurb}</span>`;
         b.addEventListener('click', () => applyTheme(t));
         list.append(b);
       }
@@ -1943,7 +1947,7 @@ body.present #present .ico-off { display: block; }
   function renderTray() {
     const list = opts.filter((o) => state.selected.has(o.key));
     trayEl.hidden = !list.length;
-    trayEl.innerHTML = list.map((o) => `<span class="tray-item" role="listitem"><button type="button" class="tray-see${onGlass(o)}" data-key="${o.key}" title="${o.shape}: show it on the vehicle"><img src="${own(o, 'thumb')}" alt="${o.shape}"></button><button type="button" class="tray-x" data-key="${o.key}" aria-label="Remove the ${o.shape}">${icon.x}</button></span>`).join('');
+    trayEl.innerHTML = list.map((o) => `<span class="tray-item" role="listitem"><button type="button" class="tray-see${onGlass(o)}" data-key="${o.key}" title="${o.shape}: show it on the vehicle"><img src="${av(own(o, 'thumb'))}" alt="${o.shape}"></button><button type="button" class="tray-x" data-key="${o.key}" aria-label="Remove the ${o.shape}">${icon.x}</button></span>`).join('');
   }
   trayEl.addEventListener('click', (e) => {
     const x = e.target.closest('.tray-x'), see = e.target.closest('.tray-see');
@@ -1988,7 +1992,7 @@ body.present #present .ico-off { display: block; }
       const tr = document.createElement('tr');
       tr.style.setProperty('--c', groupColor(o.group));
       tr.innerHTML = `
-        <td><div class="st-graphic"><span class="st-thumb${onGlass(o)}"><img src="${own(o, 'thumb')}" alt=""></span><span><span class="st-name">${o.shape}</span><span class="st-group">${groupOf[o.group].title}</span><span class="st-eg">Shown: ${own(o, 'dealer')}</span></span></div></td>
+        <td><div class="st-graphic"><span class="st-thumb${onGlass(o)}"><img src="${av(own(o, 'thumb'))}" alt=""></span><span><span class="st-name">${o.shape}</span><span class="st-group">${groupOf[o.group].title}</span><span class="st-eg">Shown: ${own(o, 'dealer')}</span></span></div></td>
         <td class="st-where">${whereText(o)}</td>
         <td class="st-size">${sizeText(o)}</td>
         <td class="st-act"><button class="st-remove" type="button">Remove</button></td>`;
@@ -2101,7 +2105,7 @@ body.present #present .ico-off { display: block; }
       <p class="ps-sub">${list.length} ${list.length === 1 ? 'graphic' : 'graphics'}, shown with real Silver Fox jobs as examples.</p>
       <div class="ps-shots">${shots.map((src) => `<img src="${src}" alt="">`).join('')}</div>
       <table class="ps-table"><thead><tr><th>Graphic</th><th>Where it goes</th><th>Printed size</th></tr></thead><tbody>
-      ${list.map((o) => `<tr><td><div class="ps-graphic"><img class="ps-thumb${onGlass(o)}" src="${own(o, 'thumb')}" alt=""><span><span class="ps-name">${o.shape}</span><span class="ps-eg">${groupOf[o.group].title}. Shown: ${own(o, 'dealer')}</span></span></div></td><td>${whereText(o)}</td><td>${sizeText(o)}</td></tr>`).join('')}
+      ${list.map((o) => `<tr><td><div class="ps-graphic"><img class="ps-thumb${onGlass(o)}" src="${av(own(o, 'thumb'))}" alt=""><span><span class="ps-name">${o.shape}</span><span class="ps-eg">${groupOf[o.group].title}. Shown: ${own(o, 'dealer')}</span></span></div></td><td>${whereText(o)}</td><td>${sizeText(o)}</td></tr>`).join('')}
       </tbody></table>
       <p class="ps-foot">Silver Fox Marketing, ${QUOTE_TO}. See this build online: ${shareLink()}</p>`;
     await Promise.all([...$('#printOut').querySelectorAll('img')].map((i) => (i.decode ? i.decode().catch(() => {}) : null)));
@@ -2122,7 +2126,7 @@ body.present #present .ico-off { display: block; }
         const on = parts.has(li.dataset.part);
         if (on && !li.getAttribute('src')) {
           // One quiet retry if the connection drops, so a graphic never stays blank.
-          li.addEventListener('error', () => setTimeout(() => { li.src = `${li.dataset.src}?retry=1`; }, 500), { once: true });
+          li.addEventListener('error', () => setTimeout(() => { li.src = `${li.dataset.src}&retry=1`; }, 500), { once: true });
           li.src = li.dataset.src;
         }
         // A graphic that just went on waits, hidden, in every view: the view on screen plays its landing, and any other
