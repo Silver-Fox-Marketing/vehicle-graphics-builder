@@ -1331,14 +1331,14 @@ body.present #present .ico-off { display: block; }
 
 <div class="print-out" id="printOut"></div>
 
-<script src="assets/layout.js?v=9ae10e5d1f"></script>
+<script src="assets/layout.js?v=5c2c756437"></script>
 <script>
 (() => {
   const L = window.VGB_LAYOUT;
   const [W, H] = L.stage;
   // Every asset URL carries the build's stamp, filled in by build/publish_pages.py when it publishes. A published
   // update then reaches a visitor on a normal reload, not after the browser's ten-minute cache.
-  const ASSET_V = '9ae10e5d1f';
+  const ASSET_V = '5c2c756437';
   const av = (u) => `${u}${u.includes('?') ? '&' : '?'}v=${ASSET_V}`;
   const MAX_ZOOM = 3.4;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
