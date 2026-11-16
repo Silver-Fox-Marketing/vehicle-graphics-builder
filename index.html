@@ -47,6 +47,7 @@
   --sec-windowlabels: #2F7D6D;
   --sec-cutvinyl: #7E858F;
   --sec-wraps: #23100A;
+  --sec-yours: #2563C9;                 /* the team's own art (2026-11-16) */
   --font-display: "Red Hat Display", "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-ui: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --r-lg: 14px;
@@ -950,6 +951,28 @@ body.present #present .ico-off { display: block; }
 }
 .btn-quiet:hover { border-color: var(--ink-3); }
 .btn-quiet:disabled { opacity: .45; cursor: default; border-color: var(--rule); }
+/* The team's own art (2026-11-16): the link above a spot's cards, and the upload dialog */
+.up-link { display: block; margin: 4px 0 12px; padding: 0; border: 0; background: none; color: var(--accent); font: 700 13px var(--font-ui); text-decoration: underline; cursor: pointer; }
+.up-dlg { width: min(520px, calc(100vw - 32px)); padding: 0; border: 0; border-radius: var(--r-lg); background: var(--sheet); color: var(--ink); box-shadow: 0 24px 64px rgba(14, 18, 24, .35); }
+.up-dlg::backdrop { background: rgba(14, 18, 24, .5); }
+.up-head { display: flex; align-items: flex-start; gap: 16px; padding: 20px 24px 12px; border-bottom: 1px solid var(--rule); }
+.up-head h2 { margin: 0; font: 800 20px/1.2 var(--font-ui); }
+.up-head p { margin: 4px 0 0; color: var(--ink-2); font-size: 13px; }
+.up-x { margin-left: auto; width: 34px; height: 34px; border: 0; border-radius: 50%; background: var(--rule); color: var(--ink); cursor: pointer; display: grid; place-items: center; }
+.up-x svg { width: 16px; height: 16px; }
+.up-form { display: grid; gap: 14px; padding: 16px 24px 8px; }
+.up-form label { display: grid; gap: 6px; color: var(--ink-2); font-size: 12.5px; font-weight: 600; }
+.up-form input, .up-form select { height: 38px; padding: 0 12px; border: 1px solid var(--rule); border-radius: var(--r-md); background: var(--sheet); color: var(--ink); font: 500 14px var(--font-ui); }
+.up-form label.up-check { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 13px; }
+.up-form label.up-check input { width: 16px; height: 16px; padding: 0; }
+.up-size { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.up-drop { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1.5px dashed var(--rule); border-radius: var(--r-md); color: var(--ink-2); font-size: 13px; }
+.up-drop.over { border-color: var(--accent); }
+.up-drop img { flex: none; width: 76px; height: 50px; padding: 4px; object-fit: contain; border-radius: 6px; background: #FFFFFF; }
+.up-drop span { flex: 1; }
+.up-drop .up-pick { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.up-note { margin: 0; min-height: 1em; color: var(--ink-2); font-size: 12.5px; overflow-wrap: anywhere; }
+.up-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 24px 20px; }
 .btn-text { border: 0; background: none; padding: 10px 6px; font-weight: 600; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
 .btn-text:hover { color: var(--accent); }
 
@@ -1329,16 +1352,58 @@ body.present #present .ico-off { display: block; }
   </div>
 </dialog>
 
+<dialog class="up-dlg" id="upDlg" aria-labelledby="upTitle">
+  <div class="up-head">
+    <div>
+      <h2 id="upTitle">Your art</h2>
+      <p id="upSub">Placed at its real size. It stays on this computer.</p>
+    </div>
+    <button class="up-x" id="upClose" type="button" aria-label="Close">
+      <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4.5 4.5l9 9M13.5 4.5l-9 9"/></svg>
+    </button>
+  </div>
+  <div class="up-form">
+    <label>Where <select id="upSlot"></select></label>
+    <div class="up-drop" id="upDrop">
+      <img id="upPreview" alt="Your art" hidden>
+      <span>Drop a PNG, JPG, SVG or PDF here, or <button class="up-pick" id="upPick" type="button">choose a file</button>.</span>
+      <input id="upFile" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml,application/pdf,.pdf,.ai" hidden>
+    </div>
+    <label>Name <input id="upName" type="text" maxlength="60" autocomplete="off"></label>
+    <div class="up-size">
+      <label>Width, inches <input id="upW" type="number" min="1" step="0.5" inputmode="decimal"></label>
+      <label>Height, inches <input id="upH" type="number" min="1" step="0.5" inputmode="decimal"></label>
+    </div>
+    <label class="up-check"><input id="upWhite" type="checkbox"> Remove the white background</label>
+    <p class="up-note" id="upNote" role="status"></p>
+  </div>
+  <div class="up-foot">
+    <button class="btn-primary" id="upGo" type="button" disabled>Place it</button>
+    <button class="btn-quiet" id="upCancel" type="button">Cancel</button>
+  </div>
+</dialog>
+
 <div class="print-out" id="printOut"></div>
 
-<script src="assets/layout.js?v=5c2c756437"></script>
+<script src="assets/layout.js?v=52d920cb9a"></script>
 <script>
 (() => {
   const L = window.VGB_LAYOUT;
   const [W, H] = L.stage;
+  // The team's own art (2026-11-16): team=1 in the link turns it on in this browser (the same switch as the
+  // Dealership builder's, which shares this browser's storage on the live site), team=0 off. See "your own art".
+  const TEAM = (() => {
+    const v = new URLSearchParams(location.search).get('team') ?? new URLSearchParams(location.hash.slice(1)).get('team');
+    try {
+      if (v === '1') localStorage.setItem('dsb-team', '1');
+      if (v === '0') localStorage.removeItem('dsb-team');
+      return localStorage.getItem('dsb-team') === '1';
+    } catch { return v === '1'; }
+  })();
+  if (TEAM) L.groups.unshift({ id: 'yours', title: 'Your art', blurb: 'Art you uploaded, at its real size. It stays on this computer.' });
   // Every asset URL carries the build's stamp, filled in by build/publish_pages.py when it publishes. A published
   // update then reaches a visitor on a normal reload, not after the browser's ten-minute cache.
-  const ASSET_V = '5c2c756437';
+  const ASSET_V = '52d920cb9a';
   const av = (u) => `${u}${u.includes('?') ? '&' : '?'}v=${ASSET_V}`;
   const MAX_ZOOM = 3.4;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1426,6 +1491,7 @@ body.present #present .ico-off { display: block; }
   const theList = (xs) => { const t = xs.map((x) => `the ${x}`); return t.length < 3 ? t.join(' and ') : `${t.slice(0, -1).join(', ')} and ${t.at(-1)}`; };
   // Cut vinyl is white lettering, so its artwork sits on a dark, glass-coloured tile.
   const onGlass = (o) => (o.group === 'cutvinyl' ? ' on-glass' : '');
+  const thumbOf = (o) => (o.upload ? o.thumb : av(own(o, 'thumb')));
   const icon = {
     plus: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9"/></svg>',
     check: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>',
@@ -1444,7 +1510,7 @@ body.present #present .ico-off { display: block; }
     li.alt = '';
     li.draggable = false;
     li.decoding = 'async';
-    li.dataset.src = av(lay.src);
+    li.dataset.src = lay.blob ? lay.src : av(lay.src);      // an upload's layer is drawn here (see "your own art")
     const [x0, y0, x1, y1] = lay.box;
     Object.assign(li.style, {
       left: (x0 / W) * 100 + '%', top: (y0 / H) * 100 + '%',
@@ -1696,6 +1762,22 @@ body.present #present .ico-off { display: block; }
   // shows everyday or seasonal graphics when the spot has both.
   const openGroups = new Map();
   function renderGroups() {
+    if (TEAM && UP_SPOTS[state.spot]) {                 // the team's own art (see "your own art")
+      const up = document.createElement('button');
+      up.type = 'button';
+      up.className = 'up-link';
+      up.textContent = `Upload art for the ${SPOT[state.spot].label.toLowerCase()}`;
+      up.addEventListener('click', () => openUpload(state.spot));
+      bodyEl.append(up);
+      for (const o of opts.filter((x) => x.upload && x.locs.includes(state.spot))) {
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'up-link';
+        del.textContent = `Delete “${o.shape}”`;
+        del.addEventListener('click', () => upRemove(o));
+        bodyEl.append(del);
+      }
+    }
     const all = opts.filter((o) => o.locs.includes(state.spot) && onVehicle(o));
     const seasonal = all.filter((o) => SEASONAL.has(o.key)).length;
     if (seasonal && seasonal < all.length) {
@@ -1750,7 +1832,7 @@ body.present #present .ico-off { display: block; }
         b.className = 'card';
         b.dataset.key = o.key;
         b.dataset.tip = `${sizeText(o)}. Example: ${own(o, 'dealer')}.`;
-        b.innerHTML = `<span class="card-art${onGlass(o)}"><img src="${av(own(o, 'thumb'))}" alt="" loading="lazy"><span class="card-check" aria-hidden="true">${icon.check}</span><span class="card-swap">${icon.swap}</span></span><span class="card-name">${o.shape.replace(/ (\d+)$/, '\u00a0$1')}</span><span class="card-msg">${own(o, 'message')}</span><span class="card-detail">${sizeText(o)}, ${own(o, 'dealer')}</span><span class="card-replaces" aria-hidden="true"></span><span class="sr card-swap-sr"></span>`;
+        b.innerHTML = `<span class="card-art${onGlass(o)}"><img src="${thumbOf(o)}" alt="" loading="lazy"><span class="card-check" aria-hidden="true">${icon.check}</span><span class="card-swap">${icon.swap}</span></span><span class="card-name">${o.shape.replace(/ (\d+)$/, '\u00a0$1')}</span><span class="card-msg">${own(o, 'message')}</span><span class="card-detail">${sizeText(o)}, ${own(o, 'dealer')}</span><span class="card-replaces" aria-hidden="true"></span><span class="sr card-swap-sr"></span>`;
         b.addEventListener('click', () => toggle(o.key));
         b.addEventListener('mouseenter', () => highlightSurfaces(o.surfaces));
         b.addEventListener('mouseleave', () => highlightSurfaces([]));
@@ -1927,6 +2009,7 @@ body.present #present .ico-off { display: block; }
     fitAll(true);
     renderLayers();
     renderPicker();
+    if (TEAM) upOnVehicle(V);                            // the team's uploads, drawn for this vehicle (see "your own art")
     const base = frames[state.view].querySelector('.base');
     const shown = Promise.resolve(base.decode ? base.decode() : null).catch(() => {});
     // The old vehicle stays under the new one until the new one has faded all the way in (.35 s).
@@ -1947,7 +2030,7 @@ body.present #present .ico-off { display: block; }
   function renderTray() {
     const list = opts.filter((o) => state.selected.has(o.key));
     trayEl.hidden = !list.length;
-    trayEl.innerHTML = list.map((o) => `<span class="tray-item" role="listitem"><button type="button" class="tray-see${onGlass(o)}" data-key="${o.key}" title="${o.shape}: show it on the vehicle"><img src="${av(own(o, 'thumb'))}" alt="${o.shape}"></button><button type="button" class="tray-x" data-key="${o.key}" aria-label="Remove the ${o.shape}">${icon.x}</button></span>`).join('');
+    trayEl.innerHTML = list.map((o) => `<span class="tray-item" role="listitem"><button type="button" class="tray-see${onGlass(o)}" data-key="${o.key}" title="${o.shape}: show it on the vehicle"><img src="${thumbOf(o)}" alt="${o.shape}"></button><button type="button" class="tray-x" data-key="${o.key}" aria-label="Remove the ${o.shape}">${icon.x}</button></span>`).join('');
   }
   trayEl.addEventListener('click', (e) => {
     const x = e.target.closest('.tray-x'), see = e.target.closest('.tray-see');
@@ -1992,7 +2075,7 @@ body.present #present .ico-off { display: block; }
       const tr = document.createElement('tr');
       tr.style.setProperty('--c', groupColor(o.group));
       tr.innerHTML = `
-        <td><div class="st-graphic"><span class="st-thumb${onGlass(o)}"><img src="${av(own(o, 'thumb'))}" alt=""></span><span><span class="st-name">${o.shape}</span><span class="st-group">${groupOf[o.group].title}</span><span class="st-eg">Shown: ${own(o, 'dealer')}</span></span></div></td>
+        <td><div class="st-graphic"><span class="st-thumb${onGlass(o)}"><img src="${thumbOf(o)}" alt=""></span><span><span class="st-name">${o.shape}</span><span class="st-group">${groupOf[o.group].title}</span><span class="st-eg">Shown: ${own(o, 'dealer')}</span></span></div></td>
         <td class="st-where">${whereText(o)}</td>
         <td class="st-size">${sizeText(o)}</td>
         <td class="st-act"><button class="st-remove" type="button">Remove</button></td>`;
@@ -2105,7 +2188,7 @@ body.present #present .ico-off { display: block; }
       <p class="ps-sub">${list.length} ${list.length === 1 ? 'graphic' : 'graphics'}, shown with real Silver Fox jobs as examples.</p>
       <div class="ps-shots">${shots.map((src) => `<img src="${src}" alt="">`).join('')}</div>
       <table class="ps-table"><thead><tr><th>Graphic</th><th>Where it goes</th><th>Printed size</th></tr></thead><tbody>
-      ${list.map((o) => `<tr><td><div class="ps-graphic"><img class="ps-thumb${onGlass(o)}" src="${av(own(o, 'thumb'))}" alt=""><span><span class="ps-name">${o.shape}</span><span class="ps-eg">${groupOf[o.group].title}. Shown: ${own(o, 'dealer')}</span></span></div></td><td>${whereText(o)}</td><td>${sizeText(o)}</td></tr>`).join('')}
+      ${list.map((o) => `<tr><td><div class="ps-graphic"><img class="ps-thumb${onGlass(o)}" src="${thumbOf(o)}" alt=""><span><span class="ps-name">${o.shape}</span><span class="ps-eg">${groupOf[o.group].title}. Shown: ${own(o, 'dealer')}</span></span></div></td><td>${whereText(o)}</td><td>${sizeText(o)}</td></tr>`).join('')}
       </tbody></table>
       <p class="ps-foot">Silver Fox Marketing, ${QUOTE_TO}. See this build online: ${shareLink()}</p>`;
     await Promise.all([...$('#printOut').querySelectorAll('img')].map((i) => (i.decode ? i.decode().catch(() => {}) : null)));
@@ -2650,6 +2733,506 @@ body.present #present .ico-off { display: block; }
   });
   $('#soonBack').addEventListener('click', () => setCollection('standard'));
 
+  /* ---------- your own art (the team's, 2026-11-16) ---------- */
+  // Barrett: "allow us to upload artwork ... and have them place directly on the dealership/vehicles (and vehicles within
+  // the vehicle graphics builder)". For our team (team=1 in the link), and the art stays in this browser. The catalog's
+  // graphics were warped onto the photos in Python; an upload is drawn here, through what build/export_maps.py writes
+  // for each vehicle, view and surface: the surface's coordinates over the view, its mask (the glass's soft edge, the
+  // hood panel, the doors and the line along their gap) and its light (the template's shadow and highlight layers on
+  // the doors, the photo's own brightness on the hood), as render_layers.py uses them. Its place in a slot follows the
+  // catalog graphic there nearest its size. An upload on the top of the windshield, the doors or the hood also goes on
+  // the Dealership builder's cars there (the two share this browser's storage on the live site).
+  const UP_SPOTS = { windshield: 1, sideglass: 1, rearglass: 1, doors: 1, hood: 1 };
+  const DEALER_SPOT = { 'top of the windshield': 'car-windshield', doors: 'car-bodyside', hood: 'car-hood' };
+  const UPL = { maps: {}, loading: {}, files: new Map() };
+  const upCap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+  function upStore(mode, fn) {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('dsb-uploads', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('art', { keyPath: 'id' });
+      r.onerror = () => rej(r.error);
+      r.onsuccess = () => {
+        const t = r.result.transaction('art', mode), q = fn(t.objectStore('art'));
+        t.oncomplete = () => { r.result.close(); res(q && q.result); };
+        t.onerror = () => { r.result.close(); rej(t.error); };
+      };
+    });
+  }
+  const upAll = () => upStore('readonly', (st) => st.getAll()).catch(() => []);
+  const upPut = (rec) => upStore('readwrite', (st) => st.put(rec));
+  const upDel = (id) => upStore('readwrite', (st) => st.delete(id));
+  const mapsFor = (vid) => (UPL.loading[vid] ||= fetch(av(`assets/upload-maps/${vid}.json`)).then((r) => r.json())
+    .then((j) => (UPL.maps[vid] = j)).catch(() => null));
+  function upFile(u, kind) {
+    if (!UPL.files.has(u)) {
+      UPL.files.set(u, fetch(av(u)).then((r) => (kind === 'bin' ? r.arrayBuffer().then((b) => new Float32Array(b))
+        : r.blob().then((b) => createImageBitmap(b, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })))));
+    }
+    return UPL.files.get(u);
+  }
+  function slotSurf(l) {
+    // A slot's own surface: the one most of its catalog graphics are on.
+    const n = {};
+    for (const x of l) n[x.surf] = (n[x.surf] || 0) + 1;
+    return Object.keys(n).sort((a, b) => n[b] - n[a])[0];
+  }
+  function upPlace(idx, slot, w, h) {
+    // Where an upload w x h inches goes in a slot on a vehicle: on the catalog graphic there nearest its size, keeping
+    // that one's top edge on glass (its bottom edge in a corner, and its outer side), its bottom edge on a window or
+    // the doors, and its middle on the hood. Positions are in each surface's own inches, as render_layers.py's.
+    const all = idx && idx.slots[slot];
+    if (!all || !all.length) return null;
+    const l = all.filter((x) => x.surf === slotSurf(all));    // a pack's piece on another surface doesn't count
+    let t = l[0], bd = Infinity;
+    for (const x of l) {
+      const d = Math.abs(Math.log(x.w / w)) + Math.abs(Math.log(x.h / h));
+      if (d < bd) { bd = d; t = x; }
+    }
+    const [a, b] = t.pos, corner = /corner/.test(slot);
+    const pos = {
+      windshield: corner ? [a + t.w / 2 < 0 ? a : a + t.w - w, b + t.h - h] : [a + t.w / 2 - w / 2, b],
+      backglass: corner ? [a + t.w / 2 < 0 ? a : a + t.w - w, b + t.h - h] : [a + t.w / 2 - w / 2, b],
+      window: [a + t.w / 2 - w / 2, b], doors: [a + t.w / 2 - w / 2, b],
+      reardoor: [a - t.w / 2 + w / 2, b], hood: [a + t.w / 2 - w / 2, b + t.h / 2 - h / 2],
+    }[t.surf];
+    return { surf: t.surf, pos, near: t };
+  }
+  // ---- drawing: WebGL 2, one full-screen triangle over the surface's box, at twice the view's resolution ----
+  let GLX = null;
+  function glx() {
+    if (GLX) return GLX;
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl2', { premultipliedAlpha: true, preserveDrawingBuffer: true, antialias: false });
+    if (!gl) throw new Error('This browser can’t draw your art here (it has WebGL 2 turned off).');
+    const sh = (type, src) => {
+      const o = gl.createShader(type);
+      gl.shaderSource(o, src);
+      gl.compileShader(o);
+      if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o));
+      return o;
+    };
+    const prog = gl.createProgram();
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, `#version 300 es
+void main() { gl_Position = vec4(gl_VertexID == 1 ? 3. : -1., gl_VertexID == 2 ? 3. : -1., 0., 1.); }`));
+    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, `#version 300 es
+precision highp float;
+uniform highp sampler2D uCoord;
+uniform sampler2D uArt, uMask, uS, uH;
+uniform vec4 uBox, uPlace;
+uniform float uStep, uScale, uRef, uSlope;
+uniform mat2 uAinv;
+uniform vec2 uT;
+uniform mat3 uHinv;
+uniform ivec2 uN;
+uniform int uConv, uShade;
+uniform bool uFlip;
+out vec4 o;
+vec2 node(int i, int j) { return texelFetch(uCoord, ivec2(clamp(i, 0, uN.x - 1), clamp(j, 0, uN.y - 1)), 0).xy; }
+void main() {
+  vec2 p = vec2(gl_FragCoord.x, uBox.w * uScale - gl_FragCoord.y) / uScale;      // view px within the box
+  vec2 g = p / uStep;
+  ivec2 i = ivec2(floor(g));
+  vec2 f = fract(g);
+  vec2 a = node(i.x, i.y), b = node(i.x + 1, i.y), c = node(i.x, i.y + 1), d = node(i.x + 1, i.y + 1);
+  if (min(min(a.x, b.x), min(c.x, d.x)) < -9000.) { o = vec4(0.); return; }    // where the map has no answer
+  vec2 q = mix(mix(a, b, f.x), mix(c, d, f.x), f.y);                           // the surface's inches here
+  float u, v;
+  if (uConv == 0) { u = (q.x - uPlace.x) / uPlace.z; v = (q.y - uPlace.y) / uPlace.w; }
+  else if (uConv == 1) { u = (uPlace.x - q.x) / uPlace.z; v = (uPlace.y + uPlace.w - q.y) / uPlace.w; }
+  else if (uConv == 2) { u = (q.x - uPlace.x) / uPlace.z; v = (uPlace.y + uPlace.w - q.y) / uPlace.w; }
+  else if (uConv == 3) {                        // doors on the SIDE surface: its canvas -> body inches, fitted per upload
+    vec2 B = uAinv * (q - uT);
+    float U = (B.x - uPlace.x) / uPlace.z, V = (B.y - uPlace.y - uSlope * (B.x - uPlace.x)) / uPlace.w;
+    u = uFlip ? 1. - U : U;                                                     // art always reads left to right
+    v = 1. - V;
+  } else {                                      // doors seen side-on: one plane fitted per upload, view px -> its (U, V)
+    vec3 r = uHinv * vec3(uBox.xy + p, 1.);
+    u = uFlip ? 1. - r.x / r.z : r.x / r.z;
+    v = 1. - r.y / r.z;
+  }
+  if (u < 0. || u > 1. || v < 0. || v > 1.) { o = vec4(0.); return; }
+  vec4 t = texture(uArt, vec2(u, v));
+  vec4 c4 = vec4(t.rgb * t.a, t.a);
+  vec2 mu = p / uBox.zw;
+  vec4 m = texture(uMask, mu);
+  if (uShade == 1 || uShade == 2) {             // the hood's light, or the doors' where the view has no light layers
+    float s = uShade == 1 ? pow(clamp(m.g / max(uRef, 1e-3), .55, 1.45), .5) : pow(clamp(m.g / max(uRef, 1e-3), .8, 1.3), .3);
+    c4.rgb = c4.rgb * min(s, 1.) + max(s - 1., 0.) * (uShade == 1 ? 140. : 110.) / 255. * c4.a;
+  } else if (uShade == 3) {                     // the template's shadows (linear burn) and highlights (screen)
+    vec3 rgb = c4.a > 0. ? c4.rgb / c4.a : vec3(0.);
+    vec4 S = texture(uS, mu), Hl = texture(uH, mu);
+    rgb = (1. - S.a) * rgb + S.a * clamp(rgb + S.rgb - 1., 0., 1.);
+    rgb = (1. - Hl.a) * rgb + Hl.a * (1. - (1. - rgb) * (1. - Hl.rgb));
+    c4.rgb = rgb * c4.a;
+  }
+  if (uShade >= 2) c4.rgb = c4.rgb * (1. - m.b) + vec3(38., 26., 22.) / 255. * c4.a * m.b;   // the line at the door gap
+  o = c4 * m.r;
+}`));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+    gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    const U = (n) => gl.getUniformLocation(prog, n);
+    GLX = { c, gl, prog, U, tex: [] };
+    return GLX;
+  }
+  function glTex(unit, src, { mip = false, float = null } = {}) {
+    const { gl } = GLX;
+    const t = GLX.tex[unit] || (GLX.tex[unit] = gl.createTexture());
+    gl.activeTexture(gl.TEXTURE0 + unit);
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    if (float) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32F, float.nx, float.ny, 0, gl.RG, gl.FLOAT, src);
+    else if (src) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+    else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+    if (mip) gl.generateMipmap(gl.TEXTURE_2D);
+    const near = !!float;
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, near ? gl.NEAREST : mip ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, near ? gl.NEAREST : gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  }
+  function solve(A, b) {                       // Gaussian elimination with partial pivoting
+    const n = b.length, M = A.map((r, i) => [...r, b[i]]);
+    for (let c = 0; c < n; c++) {
+      let piv = c;
+      for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
+      [M[c], M[piv]] = [M[piv], M[c]];
+      for (let r = c + 1; r < n; r++) { const f = M[r][c] / M[c][c]; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+    }
+    const x = new Array(n).fill(0);
+    for (let r = n - 1; r >= 0; r--) { let t = M[r][n]; for (let k = r + 1; k < n; k++) t -= M[r][k] * x[k]; x[r] = t / M[r][r]; }
+    return x;
+  }
+  function lsq(rows, ys) {                      // least squares: rows . x = ys
+    const n = rows[0].length, A = Array.from({ length: n }, () => new Array(n).fill(0)), b = new Array(n).fill(0);
+    rows.forEach((r, i) => { for (let a = 0; a < n; a++) { b[a] += r[a] * ys[i]; for (let c = 0; c < n; c++) A[a][c] += r[a] * r[c]; } });
+    return solve(A, b);
+  }
+  function inv3(m) {                            // a row-major 3 x 3
+    const [a, b, c, d, e, f, g, h, i] = m, A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g, det = a * A + b * B + c * C;
+    return [A, -(b * i - c * h), b * f - c * e, B, a * i - c * g, -(a * f - c * d), C, -(a * h - b * g), a * e - b * d].map((v) => v / det);
+  }
+  function gridAt(g, meta, X, Z) {              // a 1 in body grid, bilinear; null off it or where it has no answer
+    const gx = X - meta.x0, gz = Z - meta.z0, i = Math.floor(gx), j = Math.floor(gz);
+    if (i < 0 || j < 0 || i >= meta.nx - 1 || j >= meta.nz - 1) return null;
+    const at = (a, b) => [g[(b * meta.nx + a) * 2], g[(b * meta.nx + a) * 2 + 1]];
+    const p = [at(i, j), at(i + 1, j), at(i, j + 1), at(i + 1, j + 1)];
+    if (p.some((x) => x[0] < -9000)) return null;
+    const fx = gx - i, fz = gz - j;
+    return [0, 1].map((k) => (p[0][k] * (1 - fx) + p[1][k] * fx) * (1 - fz) + (p[2][k] * (1 - fx) + p[3][k] * fx) * fz);
+  }
+  async function doorFit(meta, place, w, h, slope) {
+    // As render_door(): the upload's own 13 x 7 points in body inches, fitted onto the SIDE surface by one affine where
+    // the view has that surface and it covers 80% of them, else one plane (a homography) onto the measured door map.
+    const b = meta.body, [X0, Zb] = place.pos, pts = [];
+    for (let j = 0; j <= 6; j++) for (let i = 0; i <= 12; i++) {
+      const U = i / 12, V = j / 6;
+      pts.push([U, V, X0 + U * w, Zb + slope * U * w + V * h]);
+    }
+    if (b.can) {
+      const can = await upFile(b.can, 'bin'), got = pts.map((p) => [p, gridAt(can, b, p[2], p[3])]).filter((x) => x[1]);
+      if (got.length >= 0.8 * pts.length) {
+        const rows = got.map(([p]) => [p[2], p[3], 1]), cx = lsq(rows, got.map((x) => x[1][0])), cy = lsq(rows, got.map((x) => x[1][1]));
+        const det = cx[0] * cy[1] - cx[1] * cy[0];
+        return { conv: 3, ainv: [cy[1] / det, -cy[0] / det, -cx[1] / det, cx[0] / det], t: [cx[2], cy[2]] };   // column-major
+      }
+    }
+    const px = await upFile(b.px, 'bin'), got = pts.map((p) => [p, gridAt(px, b, p[2], p[3])]).filter((x) => x[1]);
+    const mx = got.reduce((a, x) => a + x[1][0], 0) / got.length, my = got.reduce((a, x) => a + x[1][1], 0) / got.length, sc = 500;
+    const rows = [], ys = [];
+    for (const [p, q] of got) {
+      const x = (q[0] - mx) / sc, y = (q[1] - my) / sc;
+      rows.push([p[0], p[1], 1, 0, 0, 0, -x * p[0], -x * p[1]]); ys.push(x);
+      rows.push([0, 0, 0, p[0], p[1], 1, -y * p[0], -y * p[1]]); ys.push(y);
+    }
+    const hh = lsq(rows, ys);
+    const Hn = [...hh, 1], T = [sc, 0, mx, 0, sc, my, 0, 0, 1];           // (U, V) -> normalized px, then back to px
+    const H = [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => T[r * 3] * Hn[c] + T[r * 3 + 1] * Hn[3 + c] + T[r * 3 + 2] * Hn[6 + c]));
+    const Hi = inv3(H);
+    return { conv: 4, hinv: [Hi[0], Hi[3], Hi[6], Hi[1], Hi[4], Hi[7], Hi[2], Hi[5], Hi[8]] };                    // column-major
+  }
+  async function upDrawView(art, meta, place, w, h, idx) {
+    // One view's layer for an upload: drawn over the surface's box, reduced to the view's resolution, cropped to the
+    // art (alpha over 6, as render_layers.py's layers are).
+    const [coords, mask, S, Hl] = await Promise.all([upFile(meta.files.coords, 'bin'), upFile(meta.files.mask),
+      meta.files.S ? upFile(meta.files.S) : null, meta.files.H ? upFile(meta.files.H) : null]);
+    const { c, gl, prog, U } = glx();
+    const [x0, y0, x1, y1] = meta.box, bw = x1 - x0, bh = y1 - y0, k = 2;
+    c.width = bw * k;
+    c.height = bh * k;
+    gl.viewport(0, 0, c.width, c.height);
+    gl.useProgram(prog);
+    glTex(0, coords, { float: { nx: meta.nx, ny: meta.ny } });
+    glTex(1, art, { mip: true });
+    glTex(2, mask);
+    glTex(3, S);
+    glTex(4, Hl);
+    gl.uniform1i(U('uCoord'), 0); gl.uniform1i(U('uArt'), 1); gl.uniform1i(U('uMask'), 2); gl.uniform1i(U('uS'), 3); gl.uniform1i(U('uH'), 4);
+    gl.uniform4f(U('uBox'), x0, y0, bw, bh);
+    gl.uniform4f(U('uPlace'), place.pos[0], place.pos[1], w, h);
+    gl.uniform1f(U('uStep'), meta.step);
+    gl.uniform1f(U('uScale'), k);
+    gl.uniform1f(U('uRef'), meta.ref || 0.5);
+    gl.uniform1f(U('uSlope'), idx.slope || 0);
+    gl.uniform2i(U('uN'), meta.nx, meta.ny);
+    const fit = place.surf === 'doors' ? await doorFit(meta, place, w, h, idx.slope || 0) : null;
+    if (fit && fit.ainv) { gl.uniformMatrix2fv(U('uAinv'), false, fit.ainv); gl.uniform2f(U('uT'), fit.t[0], fit.t[1]); }
+    if (fit && fit.hinv) gl.uniformMatrix3fv(U('uHinv'), false, fit.hinv);
+    gl.uniform1i(U('uConv'), fit ? fit.conv : { windshield: 0, backglass: 0, hood: 0, reardoor: 1, window: 2 }[place.surf]);
+    gl.uniform1i(U('uShade'), { hood: 1, door: 2, light: 3 }[meta.shade] || 0);
+    gl.uniform1i(U('uFlip'), meta.passenger ? 1 : 0);
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    const out = document.createElement('canvas');
+    out.width = bw;
+    out.height = bh;
+    const g2 = out.getContext('2d', { willReadFrequently: true });
+    g2.imageSmoothingQuality = 'high';
+    g2.drawImage(c, 0, 0, bw, bh);
+    const px = g2.getImageData(0, 0, bw, bh).data;
+    let cx0 = bw, cy0 = bh, cx1 = -1, cy1 = -1;
+    for (let y = 0; y < bh; y++) for (let x = 0; x < bw; x++) {
+      if (px[(y * bw + x) * 4 + 3] > 6) { if (x < cx0) cx0 = x; if (x > cx1) cx1 = x; if (y < cy0) cy0 = y; if (y > cy1) cy1 = y; }
+    }
+    if (cx1 < 0) return null;
+    const crop = document.createElement('canvas');
+    crop.width = cx1 - cx0 + 1;
+    crop.height = cy1 - cy0 + 1;
+    crop.getContext('2d').drawImage(out, -cx0, -cy0);
+    const blob = await new Promise((r) => crop.toBlob(r, 'image/webp', 0.9));
+    return { src: URL.createObjectURL(blob), box: [x0 + cx0, y0 + cy0, x0 + cx1 + 1, y0 + cy1 + 1], blob: true };
+  }
+  function upOption(r) {
+    // An upload as a graphic: "Your art", in the slot it was placed in, on every vehicle that has that slot.
+    const key = `upload:${r.id}`, spot = SURF_SPOT[r.vsurf];
+    const o = { key, group: 'yours', shape: r.name, message: 'Your art', dealer: 'your upload', parts: [key], slots: [r.vslot],
+      where: upCap(r.vslot), surfaces: [r.vsurf], locs: [spot], size: [r.w, r.h], approx: false,
+      thumb: URL.createObjectURL(r.blob), upload: r };
+    opts.push(o);
+    byKey[key] = o;
+    for (const veh of VEHICLES) {
+      const idx = UPL.maps[veh.id], pl = upPlace(idx, r.vslot, r.w, r.h);
+      if (!pl || !idx.surfaces[pl.surf]) continue;
+      const [view, meta] = Object.entries(idx.surfaces[pl.surf]).sort((a, b) => (b[1].box[2] - b[1].box[0]) * (b[1].box[3] - b[1].box[1])
+        - (a[1].box[2] - a[1].box[0]) * (a[1].box[3] - a[1].box[1]))[0];
+      veh.parts[key] = { inches: [r.w, r.h], layers: {} };
+      veh.options[key] = { view, focus: meta.box };
+    }
+    return o;
+  }
+  async function upDraw(o, veh) {
+    const r = o.upload, idx = UPL.maps[veh.id], part = veh.parts[o.key], pl = upPlace(idx, r.vslot, r.w, r.h);
+    if (!part || !pl) return;
+    const art = r.bmp ||= await createImageBitmap(r.blob, { premultiplyAlpha: 'none' });
+    for (const [view, meta] of Object.entries(idx.surfaces[pl.surf] || {})) {
+      if (part.layers[view] || !veh.views.includes(view)) continue;
+      const lay = await upDrawView(art, meta, pl, r.w, r.h, idx);
+      if (lay) part.layers[view] = lay;
+    }
+    const best = Object.entries(part.layers).sort((a, b) => (b[1].box[2] - b[1].box[0]) * (b[1].box[3] - b[1].box[1])
+      - (a[1].box[2] - a[1].box[0]) * (a[1].box[3] - a[1].box[1]))[0];
+    if (best) veh.options[o.key] = { view: best[0], focus: best[1].box };
+  }
+  function upLayersIn(veh) {
+    // An upload's layers into this vehicle's frames, before the 3D bows (which sit on top of everything).
+    if (veh !== V) return;
+    for (const [view, f] of Object.entries(frames)) {
+      for (const o of opts.filter((x) => x.upload)) {
+        const lay = V.parts[o.key] && V.parts[o.key].layers[view];
+        if (!lay || [...f.querySelectorAll('.layer')].some((li) => li.dataset.part === o.key)) continue;
+        const li = makeLayer(o.key, view);
+        li.className = 'layer';
+        li.dataset.part = o.key;
+        f.insertBefore(li, f.querySelector('.layer[data-part^="bow3d"]'));
+      }
+    }
+    renderLayers();
+  }
+  async function upOnVehicle(veh) {
+    for (const o of opts.filter((x) => x.upload)) await upDraw(o, veh).catch(() => {});
+    upLayersIn(veh);
+  }
+  async function upStart() {
+    await Promise.all(VEHICLES.map((v) => mapsFor(v.id)));
+    const recs = (await upAll()).filter((r) => r.vslot && SURF_SPOT[r.vsurf]);
+    for (const r of recs) upOption(r);
+    const h = readHash();                       // the link may name uploads: they weren't known when it was first read
+    if (h.g && h.g.some((k) => byKey[k] && byKey[k].upload)) {
+      state.selected = new Set(h.g);
+      setVehicle(h.v || V.id, { push: false, quiet: true });
+    } else if (recs.length) {
+      await upOnVehicle(V);
+      renderCards();
+    }
+  }
+  // ---- the dialog ----
+  const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs';
+  let upSpot = null, upArt = null;
+  function upSlots(spot) {
+    const idx = UPL.maps[V.id];
+    return idx ? Object.keys(idx.slots).filter((sl) => SPOT[spot].surfaces.includes(slotSurf(idx.slots[sl]))) : [];
+  }
+  function upHint() {
+    const w = +$('#upW').value, h = +$('#upH').value, pl = upPlace(UPL.maps[V.id], $('#upSlot').value, w, h);
+    if (!(w > 0 && h > 0) || !pl) return '';
+    return `On the ${V.name} it goes where the ${fmt(pl.near.w)} × ${fmt(pl.near.h)} in catalog graphic is, at its real size; `
+      + 'anything past the edge of the glass, the doors or the hood is cut off there.';
+  }
+  function syncUp() {
+    $('#upGo').disabled = !(upArt && +$('#upW').value > 0 && +$('#upH').value > 0 && $('#upSlot').value);
+    if (upArt) $('#upNote').textContent = [upArt.say, upHint()].filter(Boolean).join(' ');
+  }
+  async function openUpload(spot) {
+    await mapsFor(V.id);
+    upSpot = spot;
+    upArt = null;
+    const slots = upSlots(spot);
+    $('#upSlot').innerHTML = slots.map((sl) => `<option value="${sl}">${upCap(sl)}</option>`).join('');
+    $('#upTitle').textContent = `Your art: ${SPOT[spot].label}`;
+    $('#upSub').textContent = `On the ${V.name}, at its real size. It stays on this computer.`;
+    $('#upPreview').hidden = true;
+    for (const id of ['upName', 'upW', 'upH']) $(`#${id}`).value = '';
+    $('#upWhite').checked = false;
+    $('#upNote').textContent = slots.length ? '' : `The ${V.name} has no place for art here yet.`;
+    syncUp();
+    $('#upDlg').showModal();
+  }
+  function toCanvas(src, w, h) {
+    const k = Math.min(1, 4096 / Math.max(w, h)), c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w * k));
+    c.height = Math.max(1, Math.round(h * k));
+    c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+    return c;
+  }
+  async function readPdf(file) {
+    const lib = await import(PDFJS);
+    lib.GlobalWorkerOptions.workerSrc = PDFJS.replace('pdf.min.mjs', 'pdf.worker.min.mjs');
+    const doc = await lib.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+    try {
+      const page = await doc.getPage(1), v1 = page.getViewport({ scale: 1 });
+      const v = page.getViewport({ scale: Math.min(8, 4096 / Math.max(v1.width, v1.height)) });
+      const c = document.createElement('canvas');
+      c.width = Math.round(v.width);
+      c.height = Math.round(v.height);
+      await page.render({ canvasContext: c.getContext('2d'), viewport: v, background: 'rgba(0,0,0,0)' }).promise;
+      return { canvas: c, inches: [v1.width / 72, v1.height / 72], pages: doc.numPages };
+    } finally { doc.destroy(); }
+  }
+  async function readUpload(file) {
+    const head = new Uint8Array(await file.slice(0, 4).arrayBuffer()), tag = String.fromCharCode(...head);
+    if (tag === '%PDF') return readPdf(file);
+    if (tag.startsWith('%!') || tag === '8BPS' || tag === 'II*\0' || tag === 'MM\0*' || (head[0] === 0xc5 && head[1] === 0xd0)) {
+      throw new Error('That file needs exporting first: save it as a PNG or a PDF.');
+    }
+    if (!/^image\/(png|jpeg|webp|svg\+xml)$/.test(file.type) && !/\.(png|jpe?g|webp|svg)$/i.test(file.name)) {
+      throw new Error('Use a PNG, JPG, WebP, SVG or PDF.');
+    }
+    const url = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      return { canvas: toCanvas(img, img.naturalWidth || 2048, img.naturalHeight || 1024) };
+    } finally { URL.revokeObjectURL(url); }
+  }
+  async function takeUpload(file) {
+    if (!file) return;
+    upArt = null;
+    syncUp();
+    $('#upNote').textContent = 'Reading the file…';
+    try {
+      const a = await readUpload(file);
+      a.name = file.name.replace(/\.[^.]+$/, '');
+      const ratio = a.canvas.width / a.canvas.height, l = (UPL.maps[V.id].slots[$('#upSlot').value] || [])[0];
+      let w = l ? l.w : 24;
+      if (a.inches && a.inches[0] >= 2 && a.inches[0] <= 400) {
+        w = a.inches[0];
+        a.say = 'The size is the PDF’s page size: change it if the file is drawn to scale.';
+      }
+      if (a.pages > 1) a.say = `${a.say || ''} It has ${a.pages} pages; the first is used.`.trim();
+      upArt = a;
+      $('#upW').value = fmt(w);
+      $('#upH').value = fmt(w / ratio);
+      $('#upName').value = a.name;
+      $('#upPreview').src = toCanvas(a.canvas, a.canvas.width, a.canvas.height).toDataURL('image/png');
+      $('#upPreview').hidden = false;
+    } catch (e) {
+      $('#upNote').textContent = (e && e.message && !/^[A-Z][a-z]+Error/.test(e.message) ? e.message : '')
+        || 'That file couldn’t be read. Try a PNG or a PDF.';
+    }
+    syncUp();
+  }
+  function dropWhite(c) {
+    const x = c.getContext('2d'), d = x.getImageData(0, 0, c.width, c.height), a = d.data;
+    for (let i = 0; i < a.length; i += 4) {
+      const m = Math.min(a[i], a[i + 1], a[i + 2]);
+      if (m > 232) a[i + 3] = Math.round(a[i + 3] * Math.max(0, (252 - m) / 20));
+    }
+    x.putImageData(d, 0, 0);
+  }
+  async function upRemove(o) {
+    try { await upDel(o.upload.id); } catch { /* not kept: nothing to forget */ }
+    state.selected.delete(o.key);
+    for (const veh of VEHICLES) {
+      for (const lay of Object.values((veh.parts[o.key] || {}).layers || {})) URL.revokeObjectURL(lay.src);
+      delete veh.parts[o.key];
+      delete veh.options[o.key];
+    }
+    for (const f of Object.values(frames)) for (const li of [...f.querySelectorAll('.layer')]) if (li.dataset.part === o.key) li.remove();
+    opts.splice(opts.indexOf(o), 1);
+    delete byKey[o.key];
+    URL.revokeObjectURL(o.thumb);
+    renderLayers();
+    renderPicker();
+    renderCards();
+    writeHash();
+    toast(`Deleted your art “${o.shape}” from this computer.`);
+  }
+  const upDrop = $('#upDrop');
+  upDrop.addEventListener('dragover', (e) => { e.preventDefault(); upDrop.classList.add('over'); });
+  upDrop.addEventListener('dragleave', () => upDrop.classList.remove('over'));
+  upDrop.addEventListener('drop', (e) => { e.preventDefault(); upDrop.classList.remove('over'); takeUpload(e.dataTransfer.files[0]); });
+  $('#upPick').addEventListener('click', () => $('#upFile').click());
+  $('#upFile').addEventListener('change', () => { takeUpload($('#upFile').files[0]); $('#upFile').value = ''; });
+  $('#upSlot').addEventListener('change', syncUp);
+  $('#upW').addEventListener('input', () => {
+    if (upArt && +$('#upW').value > 0) $('#upH').value = fmt(+$('#upW').value * upArt.canvas.height / upArt.canvas.width);
+    syncUp();
+  });
+  $('#upH').addEventListener('input', () => {
+    if (upArt && +$('#upH').value > 0) $('#upW').value = fmt(+$('#upH').value * upArt.canvas.width / upArt.canvas.height);
+    syncUp();
+  });
+  $('#upClose').addEventListener('click', () => $('#upDlg').close());
+  $('#upCancel').addEventListener('click', () => $('#upDlg').close());
+  $('#upGo').addEventListener('click', async () => {
+    const w = +$('#upW').value, h = +$('#upH').value, slot = $('#upSlot').value, pl = upPlace(UPL.maps[V.id], slot, w, h);
+    if (!upArt || !(w > 0 && h > 0) || !pl) return;
+    $('#upGo').disabled = true;
+    if ($('#upWhite').checked) dropWhite(upArt.canvas);
+    const blob = await new Promise((res) => upArt.canvas.toBlob(res, 'image/png'));
+    const rec = { id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, vslot: slot, vsurf: pl.surf,
+      name: $('#upName').value.trim() || upArt.name || 'Your art', w, h, blob, made: Date.now() };
+    if (DEALER_SPOT[slot]) rec.spot = DEALER_SPOT[slot];      // and on the Dealership builder's cars
+    let kept = true;
+    try { await upPut(rec); } catch { kept = false; }
+    const o = upOption(rec);
+    try {
+      await upDraw(o, V);
+    } catch (e) {
+      $('#upNote').textContent = e.message || 'Your art couldn’t be drawn here.';
+      $('#upGo').disabled = false;
+      return;
+    }
+    $('#upDlg').close();
+    upLayersIn(V);
+    renderCards();
+    toggle(o.key, { quiet: true });
+    toast(kept ? `Your art is on, at its real size, ${fmt(w)} × ${fmt(h)} in. It stays on this computer.`
+      : 'Your art is on for this visit: this browser won’t keep it.');
+  });
+
   /* ---------- start: the sample package (or the build the link names) on its vehicle, themes open ---------- */
   const fromHash = readHash();
   if (fromHash.g) state.selected = new Set(fromHash.g);
@@ -2657,6 +3240,7 @@ body.present #present .ico-off { display: block; }
   layoutWorld();
   setCollection(fromHash.col || 'standard', { push: false });
   ready = true;
+  if (TEAM) upStart();
 })();
 </script>
 </body>
