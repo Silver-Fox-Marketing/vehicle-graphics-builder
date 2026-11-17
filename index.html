@@ -47,7 +47,7 @@
   --sec-windowlabels: #2F7D6D;
   --sec-cutvinyl: #7E858F;
   --sec-wraps: #23100A;
-  --sec-yours: #2563C9;                 /* the team's own art (2026-11-16) */
+  --sec-yours: #2563C9;                 /* your own art (2026-11-16) */
   --font-display: "Red Hat Display", "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-ui: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --r-lg: 14px;
@@ -1390,17 +1390,8 @@ body.present #present .ico-off { display: block; }
 (() => {
   const L = window.VGB_LAYOUT;
   const [W, H] = L.stage;
-  // The team's own art (2026-11-16): team=1 in the link turns it on in this browser (the same switch as the
-  // Dealership builder's, which shares this browser's storage on the live site), team=0 off. See "your own art".
-  const TEAM = (() => {
-    const v = new URLSearchParams(location.search).get('team') ?? new URLSearchParams(location.hash.slice(1)).get('team');
-    try {
-      if (v === '1') localStorage.setItem('dsb-team', '1');
-      if (v === '0') localStorage.removeItem('dsb-team');
-      return localStorage.getItem('dsb-team') === '1';
-    } catch { return v === '1'; }
-  })();
-  if (TEAM) L.groups.unshift({ id: 'yours', title: 'Your art', blurb: 'Art you uploaded, at its real size. It stays on this computer.' });
+  // Your own art (2026-11-16; part of the builder for everyone since 2026-11-17, no longer behind team=1). See "your own art".
+  L.groups.unshift({ id: 'yours', title: 'Your art', blurb: 'Art you uploaded, at its real size. It stays on this computer.' });
   // Every asset URL carries the build's stamp, filled in by build/publish_pages.py when it publishes. A published
   // update then reaches a visitor on a normal reload, not after the browser's ten-minute cache.
   const ASSET_V = '52d920cb9a';
@@ -1762,7 +1753,7 @@ body.present #present .ico-off { display: block; }
   // shows everyday or seasonal graphics when the spot has both.
   const openGroups = new Map();
   function renderGroups() {
-    if (TEAM && UP_SPOTS[state.spot]) {                 // the team's own art (see "your own art")
+    if (UP_SPOTS[state.spot]) {                         // your own art (see "your own art")
       const up = document.createElement('button');
       up.type = 'button';
       up.className = 'up-link';
@@ -2009,7 +2000,7 @@ body.present #present .ico-off { display: block; }
     fitAll(true);
     renderLayers();
     renderPicker();
-    if (TEAM) upOnVehicle(V);                            // the team's uploads, drawn for this vehicle (see "your own art")
+    upOnVehicle(V);                                      // uploads, drawn for this vehicle (see "your own art")
     const base = frames[state.view].querySelector('.base');
     const shown = Promise.resolve(base.decode ? base.decode() : null).catch(() => {});
     // The old vehicle stays under the new one until the new one has faded all the way in (.35 s).
@@ -2733,9 +2724,9 @@ body.present #present .ico-off { display: block; }
   });
   $('#soonBack').addEventListener('click', () => setCollection('standard'));
 
-  /* ---------- your own art (the team's, 2026-11-16) ---------- */
+  /* ---------- your own art (2026-11-16) ---------- */
   // Barrett: "allow us to upload artwork ... and have them place directly on the dealership/vehicles (and vehicles within
-  // the vehicle graphics builder)". For our team (team=1 in the link), and the art stays in this browser. The catalog's
+  // the vehicle graphics builder)". Part of the builder for everyone (11/17: not "hidden behind a teams link"); the art stays in this browser. The catalog's
   // graphics were warped onto the photos in Python; an upload is drawn here, through what build/export_maps.py writes
   // for each vehicle, view and surface: the surface's coordinates over the view, its mask (the glass's soft edge, the
   // hood panel, the doors and the line along their gap) and its light (the template's shadow and highlight layers on
@@ -3240,7 +3231,7 @@ void main() {
   layoutWorld();
   setCollection(fromHash.col || 'standard', { push: false });
   ready = true;
-  if (TEAM) upStart();
+  upStart();
 })();
 </script>
 </body>
